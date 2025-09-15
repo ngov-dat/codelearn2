@@ -1,58 +1,45 @@
-// =====================
-// Scroll Animations
-// =====================
-document.addEventListener("DOMContentLoaded", () => {
-  const reveals = document.querySelectorAll(".reveal");
+document.addEventListener('DOMContentLoaded', function() {
+    // Mobile menu toggle functionality
+    const mobileMenu = document.getElementById('mobile-menu');
+    const navMenu = document.querySelector('.nav-menu');
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("active");
-      }
+    mobileMenu.addEventListener('click', () => {
+        mobileMenu.classList.toggle('active');
+        navMenu.classList.toggle('active');
     });
-  }, { threshold: 0.2 });
 
-  reveals.forEach(reveal => {
-    observer.observe(reveal);
-  });
-});
+    // Function to add scroll-based animations using Anime.js
+    function initScrollAnimations() {
+        const sections = document.querySelectorAll('section');
 
-// =====================
-// Anime.js Animations
-// =====================
-document.addEventListener("DOMContentLoaded", () => {
-  // Text animation (hero)
-  const textWrapper = document.querySelector('.ml3');
-  if (textWrapper) {
-    textWrapper.innerHTML = textWrapper.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
-    anime.timeline({ loop: false })
-      .add({
-        targets: '.ml3 .letter',
-        opacity: [0,1],
-        translateY: [50,0],
-        easing: "easeOutExpo",
-        duration: 750,
-        delay: (el, i) => 50 * i
-      });
-  }
+        sections.forEach(section => {
+            const sectionId = section.id;
+            const targets = section.querySelectorAll('.animate-block, .animate-card, .animate-item, .animate-cta-text, .animate-btn');
 
-  // Course cards stagger animation
-  anime({
-    targets: '.course-card',
-    translateY: [50, 0],
-    opacity: [0, 1],
-    delay: anime.stagger(200, {start: 500}),
-    duration: 800,
-    easing: 'easeOutExpo'
-  });
+            if (targets.length > 0) {
+                // Initialize Anime.js ScrollObserver for each section
+                anime({
+                    targets: targets,
+                    translateY: ['50px', '0'],
+                    opacity: [0, 1],
+                    easing: 'easeOutQuad',
+                    duration: 800,
+                    delay: anime.stagger(150),
+                    autoplay: false,
+                    // Use a ScrollObserver to trigger the animation
+                    // This is a more modern approach than a basic IntersectionObserver
+                    autoplay: anime.onScroll({
+                        targets: section,
+                        // This threshold defines when the animation should start
+                        enter: 'top-=150px', 
+                        // The `sync` mode ensures the animation progress is tied to the scroll position
+                        sync: 'in'
+                    })
+                });
+            }
+        });
+    }
 
-  // Floating shapes animation
-  anime({
-    targets: '.floating-shape',
-    translateY: [0, 20],
-    direction: 'alternate',
-    loop: true,
-    easing: 'easeInOutSine',
-    duration: 2000
-  });
+    // Call the function to set up animations on page load
+    initScrollAnimations();
 });
